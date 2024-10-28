@@ -9,7 +9,6 @@ export function useRequireAuth() {
   const router = useRouter();
 
   useEffect(() => {
-    console.log("useRequireAuth => ", session, status)
     if (status === "unauthenticated") {
       router.push("/login");
     }

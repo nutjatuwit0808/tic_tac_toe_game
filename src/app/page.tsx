@@ -18,7 +18,7 @@ export default function LandingPage() {
       <h2 className="text-2xl font-semibold mb-4">Game Rules</h2>
       <ul className="text-base md:text-lg list-disc list-inside mb-8 text-center max-w-lg">
         <li>The game is played on a 3x3 grid.</li>
-        <li>Players take turns marking a cell with "X" or "O".</li>
+        <li>Players take turns marking a cell with "X".</li>
         <li>The first player to align three marks in a row wins.</li>
         <li>If all cells are filled with no winner, it's a tie.</li>
       </ul>

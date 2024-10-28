@@ -56,7 +56,6 @@ export default function TictactoeGame() {
   };
 
   useEffect(() => {
-    console.log("board => ", board);
     if (!isPlayerTurn && !checkWinner(board)) {
       const timer = setTimeout(() => botMove(), 500);
       return () => clearTimeout(timer);
@@ -64,18 +63,19 @@ export default function TictactoeGame() {
   }, [isPlayerTurn, board]);
 
   useEffect(() => {
-    console.log("use login => ", session);
     if (session?.user?.email) fetchGetUserScore();
   }, [session?.user?.email]);
 
   const winner = checkWinner(board);
 
   useEffect(() => {
-    console.log("winner => ", winner);
     if (winner === "X") {
       fetchUpdateUserScore(true);
     } else if (winner === "O") {
       fetchUpdateUserScore(false);
+    } else {
+      setBoard(Array(9).fill(null));
+      setIsPlayerTurn(true);
     }
   }, [winner]);
 
@@ -103,7 +103,7 @@ export default function TictactoeGame() {
       setIsPlayerTurn(true);
       console.log("Add score success");
 
-      fetchGetUserScore()
+      fetchGetUserScore();
     } else {
       console.log("Add score failed");
     }
@@ -117,7 +117,6 @@ export default function TictactoeGame() {
       return;
     }
 
-    // Fetch request with email as a query parameter
     const userScoreResp = await fetch(
       `/api/getUserScore?email=${encodeURIComponent(email)}`,
       {
@@ -125,8 +124,6 @@ export default function TictactoeGame() {
         headers: { "Content-Type": "application/json" },
       }
     );
-
-    console.log("fetchGetUserScore userScoreResp => ", userScoreResp);
 
     if (userScoreResp.ok) {
       const userScoreData = await userScoreResp.json(); // Parse the JSON data
@@ -137,7 +134,6 @@ export default function TictactoeGame() {
 
       setScore(score);
       setWinStreak(winStreak);
-
     } else {
       console.log("Get score failed");
     }
@@ -145,33 +141,43 @@ export default function TictactoeGame() {
 
   if (isLoading) return <div>Loading...</div>;
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
-      <div className="w-full flex justify-end gap-4 text-gray-600 font-bold">
-        <h2>Score {score}</h2>
-        <h2>Winning Streak {winStreak}</h2>
-      </div>
-      <h1 className="text-4xl font-bold mb-6 text-blue-600">Tic Tac Toe</h1>
-
-      <div className="grid grid-cols-3 gap-4 w-64">
-        {board.map((value, idx) => (
-          <button
-            key={idx}
-            onClick={() => handleClick(idx)}
-            className="square w-20 h-20 flex items-center justify-center bg-white border border-gray-300 text-2xl font-bold hover:bg-blue-100 text-blue-400"
-          >
-            {value}
-          </button>
-        ))}
-      </div>
-
-      <div className="mt-6 text-xl">
-        {winner ? (
-          <h2 className="text-green-500 font-semibold">{winner} wins!</h2>
-        ) : isPlayerTurn ? (
-          <h2 className="text-blue-500">Your turn</h2>
-        ) : (
-          <h2 className="text-red-500">Bot's turn</h2>
+    <div className="bg-gradient-to-b from-blue-500 to-purple-700">
+      <div className="w-full flex justify-end gap-4 text-white font-bold p-12">
+        {score && (
+          <div className="bg-green-500 p-2 rounded-md opacity-90">
+            <h2>Score {score}</h2>
+          </div>
         )}
+        {winStreak && (
+          <h2 className="bg-orange-500 p-2 rounded-md">
+            Winning Streak {winStreak}
+          </h2>
+        )}
+      </div>
+      <div className="flex flex-col items-center h-screen mt-12">
+        <div className="grid grid-cols-3 gap-4 w-128">
+          {board.map((value, idx) => (
+            <button
+              key={idx}
+              onClick={() => handleClick(idx)}
+              className={`square w-24 h-24 flex items-center justify-center bg-white border border-gray-300 text-4xl rounded-md font-bold hover:bg-blue-100 ${
+                value === "O" ? "text-blue-600" : "text-red-600"
+              } `}
+            >
+              {value}
+            </button>
+          ))}
+        </div>
+
+        <div className="mt-6 text-2xl font-bold">
+          {winner ? (
+            <h2 className="text-green-500 font-semibold">{winner} wins!</h2>
+          ) : isPlayerTurn ? (
+            <h2 className="text-white">Your turn</h2>
+          ) : (
+            <h2 className="text-white">Bot's turn</h2>
+          )}
+        </div>
       </div>
     </div>
   );

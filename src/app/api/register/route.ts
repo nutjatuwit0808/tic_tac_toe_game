@@ -12,7 +12,6 @@ export async function POST(req: any) {
 
     await connectMongoDB();
     await User.create({ email, password: hashedPassword });
-    // await UserScore.create({ email });
 
     return NextResponse.json({ email, password }, { status: 201 });
   } catch (error) {
