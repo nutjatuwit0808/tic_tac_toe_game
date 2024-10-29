@@ -1,36 +1,29 @@
 "use client";
+import LoggingOutScreen from "@/components/logging-out-screen";
+import { X, O, winPatterns } from "@/constants/game.constant";
+import { useErrorMsg } from "@/hooks/useErrorMsg";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
 import React, { useState, useEffect } from "react";
 
 export default function TictactoeGame() {
   const { session, isLoading } = useRequireAuth();
+  const {errorMsg, setErrorMsg} = useErrorMsg();
 
   const [board, setBoard] = useState<Array<string | null>>(Array(9).fill(null));
   const [isPlayerTurn, setIsPlayerTurn] = useState<boolean>(true);
   const [score, setScore] = useState<number | undefined>();
   const [winStreak, setWinStreak] = useState<number | undefined>();
-
+  
   const handleClick = (index: number) => {
     if (board[index] || checkWinner(board)) return;
 
     const newBoard = [...board];
-    newBoard[index] = isPlayerTurn ? "X" : "O";
+    newBoard[index] = isPlayerTurn ? X : O;
     setBoard(newBoard);
     setIsPlayerTurn(!isPlayerTurn);
   };
 
   const checkWinner = (board: Array<string | null>): string | null => {
-    const winPatterns = [
-      [0, 1, 2],
-      [3, 4, 5],
-      [6, 7, 8],
-      [0, 3, 6],
-      [1, 4, 7],
-      [2, 5, 8],
-      [0, 4, 8],
-      [2, 4, 6],
-    ];
-
     for (let pattern of winPatterns) {
       const [a, b, c] = pattern;
       if (board[a] && board[a] === board[b] && board[a] === board[c]) {
@@ -49,7 +42,7 @@ export default function TictactoeGame() {
 
     if (randomMove !== undefined) {
       const newBoard = [...board];
-      newBoard[randomMove] = "O";
+      newBoard[randomMove] = O;
       setBoard(newBoard);
       setIsPlayerTurn(true);
     }
@@ -69,9 +62,9 @@ export default function TictactoeGame() {
   const winner = checkWinner(board);
 
   useEffect(() => {
-    if (winner === "X") {
+    if (winner === X) {
       fetchUpdateUserScore(true);
-    } else if (winner === "O") {
+    } else if (winner === O) {
       fetchUpdateUserScore(false);
     } else {
       setBoard(Array(9).fill(null));
@@ -101,11 +94,8 @@ export default function TictactoeGame() {
       //clear all game
       setBoard(Array(9).fill(null));
       setIsPlayerTurn(true);
-      console.log("Add score success");
 
       fetchGetUserScore();
-    } else {
-      console.log("Add score failed");
     }
   };
 
@@ -113,7 +103,7 @@ export default function TictactoeGame() {
     // Check if email exists in session
     const email = session?.user?.email;
     if (!email) {
-      console.log("No email in session");
+      setErrorMsg("No email in session")
       return;
     }
 
@@ -126,8 +116,7 @@ export default function TictactoeGame() {
     );
 
     if (userScoreResp.ok) {
-      const userScoreData = await userScoreResp.json(); // Parse the JSON data
-      console.log("Get score success", userScoreData);
+      const userScoreData = await userScoreResp.json();
 
       let score = userScoreData?.userScore?.score ?? undefined;
       let winStreak = userScoreData?.userScore?.winning_streak ?? undefined;
@@ -135,11 +124,12 @@ export default function TictactoeGame() {
       setScore(score);
       setWinStreak(winStreak);
     } else {
-      console.log("Get score failed");
+      setErrorMsg("Get score failed");
     }
   };
 
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading) return <LoggingOutScreen />;
+
   return (
     <div className="bg-gradient-to-b from-blue-500 to-purple-700">
       <div className="w-full flex justify-end gap-4 text-white font-bold p-12">
@@ -161,14 +151,14 @@ export default function TictactoeGame() {
               key={idx}
               onClick={() => handleClick(idx)}
               className={`square w-24 h-24 flex items-center justify-center bg-white border border-gray-300 text-4xl rounded-md font-bold hover:bg-blue-100 ${
-                value === "O" ? "text-blue-600" : "text-red-600"
+                value === O ? "text-blue-600" : "text-red-600"
               } `}
             >
               {value}
             </button>
           ))}
         </div>
-
+        <h2 className="text-center font-bold text-red-500">{errorMsg}</h2>
         <div className="mt-6 text-2xl font-bold">
           {winner ? (
             <h2 className="text-green-500 font-semibold">{winner} wins!</h2>

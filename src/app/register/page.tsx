@@ -1,6 +1,8 @@
-"use client"
+"use client";
+import SuccessNotification from "@/components/success-notification";
+import { useErrorMsg } from "@/hooks/useErrorMsg";
 import { useRouter } from "next/navigation";
-import React, { FormEvent, useState } from "react";
+import React, { FormEvent, useEffect, useState } from "react";
 
 type Props = {};
 
@@ -8,13 +10,15 @@ export default function RegisterPage({}: Props) {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [confirmPassword, setConfirmPassword] = useState<string>("");
+  const [isRegisterSuccess, setIsRegisterSuccess] = useState<boolean>(false);
+  const {errorMsg, setErrorMsg} = useErrorMsg();
   const router = useRouter();
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
     if (password !== confirmPassword) {
-      alert("Passwords do not match");
+      setErrorMsg("Passwords do not match");
       return;
     }
 
@@ -24,8 +28,8 @@ export default function RegisterPage({}: Props) {
       body: JSON.stringify({ email }),
     });
     const { user } = await hasUserResp.json();
-    if(user) {
-      alert("User already exist!")
+    if (user) {
+      setErrorMsg("User already exist!");
       return;
     }
 
@@ -36,15 +40,20 @@ export default function RegisterPage({}: Props) {
     });
 
     if (registerResp.ok) {
-      alert("Register success!");
-      router.push("/login");
+      setIsRegisterSuccess(true);
+      setTimeout(() => {
+        router.push("/login");
+      }, 1000);
     } else {
-      alert("Failed to authenticate");
+      setErrorMsg("Failed to registration!");
     }
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gradient-to-b from-blue-500 to-purple-700">
+    <div className="relative flex items-center justify-center min-h-screen bg-gradient-to-b from-blue-500 to-purple-700">
+      {isRegisterSuccess && (
+        <SuccessNotification message={"Your registration was successful."} />
+      )}
       <div className="w-full max-w-md p-6 bg-white rounded-lg shadow-md">
         <h2 className="text-2xl font-semibold text-center text-gray-600  mb-6">
           {"Register"}
@@ -80,6 +89,7 @@ export default function RegisterPage({}: Props) {
           >
             {"Register"}
           </button>
+          <h2 className="text-center font-bold text-red-500">{errorMsg}</h2>
         </form>
         <button
           onClick={router.back}

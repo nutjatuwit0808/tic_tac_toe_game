@@ -6,6 +6,7 @@ import { useState, FormEvent, MouseEvent } from "react";
 export default function LoginPage() {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
+  const [errorMsg, setErrorMsg] = useState<string>("");
   const router = useRouter();
 
   const handleSubmit = async (e: FormEvent) => {
@@ -19,9 +20,10 @@ export default function LoginPage() {
     });
 
     if (loginResp?.error) {
-      alert("Invalid credentials");
+      setErrorMsg("Login failed!")
       return;
     } else {
+      setErrorMsg("")
       router.push("/tictactoe");
     }
   };
@@ -34,7 +36,9 @@ export default function LoginPage() {
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-b from-blue-500 to-purple-700">
       <div className="w-full max-w-md p-6 bg-white rounded-lg shadow-md">
-        <h2 className="text-2xl font-semibold text-center text-gray-600 mb-6">{"Login"}</h2>
+        <h2 className="text-2xl font-semibold text-center text-gray-600 mb-6">
+          {"Login"}
+        </h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           <input
             type="email"
@@ -58,6 +62,7 @@ export default function LoginPage() {
           >
             {"Login"}
           </button>
+          <h2 className="text-center font-bold text-red-500">{errorMsg}</h2>
         </form>
         <button
           onClick={handleClickRegister}
