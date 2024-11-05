@@ -7,13 +7,13 @@ import React, { useState, useEffect } from "react";
 
 export default function TictactoeGame() {
   const { session, isLoading } = useRequireAuth();
-  const {errorMsg, setErrorMsg} = useErrorMsg();
+  const { errorMsg, setErrorMsg } = useErrorMsg();
 
   const [board, setBoard] = useState<Array<string | null>>(Array(9).fill(null));
   const [isPlayerTurn, setIsPlayerTurn] = useState<boolean>(true);
   const [score, setScore] = useState<number | undefined>();
   const [winStreak, setWinStreak] = useState<number | undefined>();
-  
+
   const handleClick = (index: number) => {
     if (board[index] || checkWinner(board)) return;
 
@@ -103,7 +103,7 @@ export default function TictactoeGame() {
     // Check if email exists in session
     const email = session?.user?.email;
     if (!email) {
-      setErrorMsg("No email in session")
+      setErrorMsg("No email in session");
       return;
     }
 
@@ -133,16 +133,12 @@ export default function TictactoeGame() {
   return (
     <div className="bg-gradient-to-b from-blue-500 to-purple-700">
       <div className="w-full flex justify-end gap-4 text-white font-bold p-12">
-        {score && (
-          <div className="bg-green-500 p-2 rounded-md opacity-90">
-            <h2>Score {score}</h2>
-          </div>
-        )}
-        {winStreak && (
-          <h2 className="bg-orange-500 p-2 rounded-md">
-            Winning Streak {winStreak}
-          </h2>
-        )}
+        <div className="bg-green-500 p-2 rounded-md opacity-90">
+          <h2>Score {score ?? 0}</h2>
+        </div>
+        <h2 className="bg-orange-500 p-2 rounded-md">
+          Winning Streak {winStreak ?? 0}
+        </h2>
       </div>
       <div className="flex flex-col items-center h-screen mt-12">
         <div className="grid grid-cols-3 gap-4 w-128">

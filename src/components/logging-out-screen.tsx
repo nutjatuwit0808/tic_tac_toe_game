@@ -4,12 +4,12 @@ import React, { useEffect, useState } from "react";
 type Props = {};
 
 export default function LoggingOutScreen({}: Props) {
-  const [loadingText, setLoadingText] = useState<string>("Logging Out");
+  const [loadingText, setLoadingText] = useState<string>("Loading");
 
   useEffect(() => {
     const interval = setInterval(() => {
       setLoadingText((prev) =>
-        prev === "Logging Out..." ? "Logging Out" : prev + "."
+        prev === "Loading..." ? "Loading" : prev + "."
       );
     }, 500);
 
